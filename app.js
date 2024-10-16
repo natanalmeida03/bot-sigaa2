@@ -4,6 +4,7 @@ const cheerio = require("cheerio");
 const notifier = require("node-notifier");
 
 function sendPostRequest(State, JSESSIONID, turma) {
+  const time = new Date().toLocaleTimeString();
   const payload = {
     form: "form",
     "form:checkCodigo": "on",
@@ -53,19 +54,19 @@ function sendPostRequest(State, JSESSIONID, turma) {
       const linhas = $("tr.linhaImpar, tr.linhaPar");
       const offline = $('script').filter((i, el) => {
         return $(el).html().includes("alert('N\\u00E3o foi poss\\u00CDvel finalizar a opera\\u00E7\\u00E3o, pois a p\\u00E1gina que se est\\u00E1 tentando acessar n\\u00E3o est\\u00E1 mais ativa. Por favor, reinicie os procedimentos.')");
-      }).length > 0;
+      }).length > 0 || $('label[for="username"]').length > 0;;
 
       if(offline){
-        console.log(`A sessão "${JSESSIONID}" ou o estado do formulário "${State}" da conta não funciona mais... Re-logue no SIGAA e consiga novos dados.`)
+        console.log(`A sessão "${JSESSIONID}" ou o estado do formulário "${State}" da conta não funciona mais... Re-logue no SIGAA e consiga novos dados. - ${time}`)
         process.exit(0);
       }
       if (linhas.length === 0) {
         console.log(
-          `Não achado matéria com código "${turma.code}", professor "${turma.teacher}", horário "${turma.time}".`
+          `Não achado matéria com código "${turma.code}", professor "${turma.teacher}", horário "${turma.time}". - ${time}`
         );
       } else {
         console.log(
-          `Encontrado matéria com código "${turma.code}", professor "${turma.teacher}", horário "${turma.time}".`
+          `Encontrado matéria com código "${turma.code}", professor "${turma.teacher}", horário "${turma.time}". - ${time}`
         );
         notifier.notify({
           title: "MATÉRIA ENCONTRADA",
@@ -89,9 +90,9 @@ const JSESSIONID = ""; //ADICIONAR O JSESSIONID
 // TURMAS QUE DESEJA MONITORAR
 const Turmas = [
   {
-    code: "FGA0313",
+    code: "FGA0053",
     teacher: "",
-    time: "35M12",
+    time: "",
   },
 ];
 
